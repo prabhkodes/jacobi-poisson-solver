@@ -3,6 +3,14 @@
 The same 2-D Laplace problem solved four ways, to see how each parallel model behaves when you actually
 scale it — and what it costs to write files while you do.
 
+<p align="center">
+  <img src="results/plots/jacobi_diffusion.gif" width="560" alt="Jacobi iterations relaxing a hot corner">
+</p>
+
+<p align="center"><sub>Heat relaxing from a hot corner. Stitched back together from two MPI ranks —
+each rank owns a row block and writes its own slab, and the animation reassembles them, so this is also
+a check that the decomposition and the I/O agree.</sub></p>
+
 | Variant | Model | What it adds | Benchmarked to |
 |---|---|---|---|
 | [`mpi-openmp/`](mpi-openmp/) | MPI + OpenMP | Baseline hybrid — `#pragma omp parallel for collapse(2) schedule(static)` over the stencil | 1120 cores / 10 nodes |
@@ -161,7 +169,8 @@ Nsight traces are in [`results/gpu/`](results/gpu/), collected with
 - Each variant is standalone
 - All read a plain-text config from [`input/`](input/): grid size, corner value, initial fill, step count
 - SLURM scripts for every variant are in [`scripts/slurm/`](scripts/slurm/)
-- Output goes to `files/`, animate with [`results/analysis/animate_jacobi.gp`](results/analysis/animate_jacobi.gp)
+- Output goes to `files/` as one `.dat` per rank per step
+- `gnuplot results/analysis/animate_jacobi.gp` stitches the ranks together and renders the animation at the top of this README
 - The OpenACC build has a [`Dockerfile`](mpi-openacc/Dockerfile) if you'd rather not install the NVIDIA HPC SDK
 
 **MPI + OpenMP**
@@ -209,7 +218,7 @@ input/                 run configurations
 scripts/slurm/         batch scripts, Nsight profiling
 results/
   cpu/  io/  gpu/      raw timing output
-  plots/               figures used above
+  plots/               figures and the animation used above
   analysis/            plotting and animation scripts
   exam-report.md       full write-up with raw run tables
 ```
