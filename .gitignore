@@ -1,0 +1,8 @@
+files/
+*.o
+*.x
+*.dat.bak
+build/
+__pycache__/
+.DS_Store
+*.h5

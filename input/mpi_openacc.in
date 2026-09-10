@@ -1,0 +1,4 @@
+dimension_nb 10
+corner 100
+field_fill 0.5
+max_steps 100

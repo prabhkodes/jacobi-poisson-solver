@@ -1,0 +1,453 @@
+Size = 10,000
+Steps = 1,000
+
+====================================================================================================================
+
+Nodes=1  Ranks/node=2  OMP threads=56
+Slurm: cpus-per-task=56  ntasks-per-socket=1
+STARTING solver execution at rank 0 || 2025-11-05 14:41:38.818
+ENDING solver execution at rank 0 || 2025-11-05 14:42:13.400
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 1834309ms Min time: 52840ms Avg time : 943574ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 386677ms Min time: 386456ms Avg time : 386566ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 34524307ms Min time: 32741145ms Avg time : 3.36327e+07ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 34582923ms Min time: 34582029ms Avg time : 3.45825e+07ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=1  Ranks/node=4  OMP threads=28
+Slurm: cpus-per-task=28  ntasks-per-socket=2
+STARTING solver execution at rank 0 || 2025-11-05 14:51:26.990
+ENDING solver execution at rank 0 || 2025-11-05 14:51:45.722
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 958298ms Min time: 215743ms Avg time : 523140ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 195283ms Min time: 190905ms Avg time : 193012ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 18511096ms Min time: 17767304ms Avg time : 1.82017e+07ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 18732559ms Min time: 18728820ms Avg time : 1.8731e+07ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=1  Ranks/node=8  OMP threads=14
+Slurm: cpus-per-task=14  ntasks-per-socket=4
+STARTING solver execution at rank 0 || 2025-11-05 14:55:10.061
+ENDING solver execution at rank 0 || 2025-11-05 14:55:27.551
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 843351ms Min time: 455448ms Avg time : 649452ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 99449ms Min time: 96576ms Avg time : 98163.5ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 17027085ms Min time: 16640248ms Avg time : 1.68335e+07ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 17492185ms Min time: 17489127ms Avg time : 1.74911e+07ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=1  Ranks/node=14  OMP threads=8
+Slurm: cpus-per-task=8  ntasks-per-socket=7
+STARTING solver execution at rank 0 || 2025-11-05 14:53:17.872
+ENDING solver execution at rank 0 || 2025-11-05 14:53:35.449
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 1068969ms Min time: 223605ms Avg time : 671018ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 57677ms Min time: 56285ms Avg time : 57142.7ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 17352688ms Min time: 16508933ms Avg time : 1.6904e+07ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 17584311ms Min time: 17577010ms Avg time : 1.75817e+07ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=1  Ranks/node=28  OMP threads=4
+Slurm: cpus-per-task=4  ntasks-per-socket=14
+STARTING solver execution at rank 0 || 2025-11-05 14:57:26.801
+ENDING solver execution at rank 0 || 2025-11-05 14:57:43.683
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 792254ms Min time: 225261ms Avg time : 541345ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 31619ms Min time: 29890ms Avg time : 30791.6ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 16650145ms Min time: 16085048ms Avg time : 1.63356e+07ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 16887865ms Min time: 16881430ms Avg time : 1.68843e+07ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=1  Ranks/node=56  OMP threads=2
+Slurm: cpus-per-task=2  ntasks-per-socket=28
+STARTING solver execution at rank 0 || 2025-11-05 14:59:06.395
+ENDING solver execution at rank 0 || 2025-11-05 14:59:23.562
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 997962ms Min time: 218445ms Avg time : 710556ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 17340ms Min time: 16529ms Avg time : 16871.4ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 16970285ms Min time: 16184141ms Avg time : 1.647e+07ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 17197252ms Min time: 17167602ms Avg time : 1.71879e+07ms
+----------------------------------------------------------------------------------------------------
+
+
+====================================================================================================================
+
+Nodes=2  Ranks/node=56  OMP threads=2
+Slurm: cpus-per-task=2  ntasks-per-socket=28
+STARTING solver execution at rank 0 || 2025-11-05 15:01:09.992
+ENDING solver execution at rank 0 || 2025-11-05 15:01:18.599
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 558735ms Min time: 238054ms Avg time : 409885ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  8908ms Min time:  8274ms Avg time : 8639.3ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 8364774ms Min time: 8047274ms Avg time : 8.19467e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 8615125ms Min time: 8606439ms Avg time : 8.61138e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=2  Ranks/node=2  OMP threads=56
+Slurm: cpus-per-task=56  ntasks-per-socket=1
+STARTING solver execution at rank 0 || 2025-11-05 15:02:47.794
+ENDING solver execution at rank 0 || 2025-11-05 15:03:05.440
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 1813151ms Min time: 98628ms Avg time : 725581ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 193517ms Min time: 190881ms Avg time : 192508ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 17540511ms Min time: 15823815ms Avg time : 1.69131e+07ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 17645782ms Min time: 17641698ms Avg time : 1.76442e+07ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=2  Ranks/node=28  OMP threads=4
+Slurm: cpus-per-task=4  ntasks-per-socket=14
+STARTING solver execution at rank 0 || 2025-11-05 15:04:06.417
+ENDING solver execution at rank 0 || 2025-11-05 15:04:15.096
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 659602ms Min time: 351838ms Avg time : 486179ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 15662ms Min time: 14573ms Avg time : 15165.1ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 8325181ms Min time: 8019248ms Avg time : 8.19125e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 8687286ms Min time: 8679045ms Avg time : 8.68438e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=2  Ranks/node=4  OMP threads=28
+Slurm: cpus-per-task=28  ntasks-per-socket=2
+STARTING solver execution at rank 0 || 2025-11-05 15:06:20.515
+ENDING solver execution at rank 0 || 2025-11-05 15:06:30.066
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 1042787ms Min time: 286233ms Avg time : 609047ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 99132ms Min time: 96846ms Avg time : 98001.4ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 9263563ms Min time: 8501250ms Avg time : 8.93702e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 9555330ms Min time: 9550960ms Avg time : 9.55284e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=2  Ranks/node=14  OMP threads=8
+Slurm: cpus-per-task=8  ntasks-per-socket=7
+STARTING solver execution at rank 0 || 2025-11-05 15:07:36.402
+ENDING solver execution at rank 0 || 2025-11-05 15:07:45.308
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 1006469ms Min time: 270154ms Avg time : 602601ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 29460ms Min time: 28322ms Avg time : 28979.8ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 8638316ms Min time: 7902113ms Avg time : 8.30365e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 8916016ms Min time: 8905249ms Avg time : 8.91265e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=2  Ranks/node=8  OMP threads=14
+Slurm: cpus-per-task=14  ntasks-per-socket=4
+STARTING solver execution at rank 0 || 2025-11-05 15:09:04.634
+ENDING solver execution at rank 0 || 2025-11-05 15:09:13.470
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 948077ms Min time: 338722ms Avg time : 611260ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 50145ms Min time: 48372ms Avg time : 49051.7ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 8495852ms Min time: 7886313ms Avg time : 8.22177e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 8842469ms Min time: 8835910ms Avg time : 8.84028e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+====================================================================================================================
+
+Nodes=4  Ranks/node=8  OMP threads=14
+Slurm: cpus-per-task=14  ntasks-per-socket=4
+STARTING solver execution at rank 0 || 2025-11-05 15:10:07.202
+ENDING solver execution at rank 0 || 2025-11-05 15:10:11.574
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 503320ms Min time: 263071ms Avg time : 379559ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 25846ms Min time: 24116ms Avg time : 24674.2ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 4105777ms Min time: 3867458ms Avg time : 3.98923e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 4377507ms Min time: 4372355ms Avg time : 4.37476e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=4  Ranks/node=14  OMP threads=8
+Slurm: cpus-per-task=8  ntasks-per-socket=7
+STARTING solver execution at rank 0 || 2025-11-05 15:12:12.573
+ENDING solver execution at rank 0 || 2025-11-05 15:12:16.898
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 410120ms Min time: 245428ms Avg time : 330209ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 15563ms Min time: 14205ms Avg time : 14887.2ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 4076145ms Min time: 3915415ms Avg time : 3.99219e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 4331581ms Min time: 4324396ms Avg time : 4.32825e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=4  Ranks/node=28  OMP threads=4
+Slurm: cpus-per-task=4  ntasks-per-socket=14
+STARTING solver execution at rank 0 || 2025-11-05 15:13:46.732
+ENDING solver execution at rank 0 || 2025-11-05 15:13:51.100
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 503603ms Min time: 247651ms Avg time : 372068ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  8356ms Min time:  7586ms Avg time : 7915.18ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 4122451ms Min time: 3865127ms Avg time : 3.99656e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 4377580ms Min time: 4368790ms Avg time : 4.37432e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=4  Ranks/node=4  OMP threads=28
+Slurm: cpus-per-task=28  ntasks-per-socket=2
+STARTING solver execution at rank 0 || 2025-11-05 15:15:18.867
+ENDING solver execution at rank 0 || 2025-11-05 15:15:35.801
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 13228219ms Min time: 4686080ms Avg time : 1.21128e+07ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 51171ms Min time: 48527ms Avg time : 49660.9ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 12414469ms Min time: 3830024ms Avg time : 4.93724e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 17107546ms Min time: 16933770ms Avg time : 1.70561e+07ms
+----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+====================================================================================================================
+
+Nodes=8  Ranks/node=2  OMP threads=56
+Slurm: cpus-per-task=56  ntasks-per-socket=1
+STARTING solver execution at rank 0 || 2025-11-05 15:22:21.886
+ENDING solver execution at rank 0 || 2025-11-05 15:22:26.389
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 541798ms Min time: 145017ms Avg time : 385907ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 51349ms Min time: 47925ms Avg time : 49803.7ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 4355253ms Min time: 3959638ms Avg time : 4.11422e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 4507392ms Min time: 4502770ms Avg time : 4.50496e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=8  Ranks/node=56  OMP threads=2
+Slurm: cpus-per-task=2  ntasks-per-socket=28
+STARTING solver execution at rank 0 || 2025-11-05 15:24:01.413
+ENDING solver execution at rank 0 || 2025-11-05 15:24:03.614
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 344502ms Min time: 170025ms Avg time : 275046ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  2503ms Min time:  2164ms Avg time : 2328.93ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 2026740ms Min time: 1875565ms Avg time : 1.93807e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 2228481ms Min time: 2201607ms Avg time : 2.21765e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=8  Ranks/node=28  OMP threads=4
+Slurm: cpus-per-task=4  ntasks-per-socket=14
+STARTING solver execution at rank 0 || 2025-11-05 15:25:12.502
+ENDING solver execution at rank 0 || 2025-11-05 15:25:14.692
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 328780ms Min time: 192005ms Avg time : 260794ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  4449ms Min time:  3712ms Avg time : 4001.94ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 2014018ms Min time: 1880396ms Avg time : 1.93908e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 2213210ms Min time: 2189138ms Avg time : 2.20408e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=8  Ranks/node=4  OMP threads=28
+Slurm: cpus-per-task=28  ntasks-per-socket=2
+STARTING solver execution at rank 0 || 2025-11-05 15:26:15.485
+ENDING solver execution at rank 0 || 2025-11-05 15:26:18.021
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 563492ms Min time: 394898ms Avg time : 454712ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 25513ms Min time: 24006ms Avg time : 24683.7ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 2140872ms Min time: 1973263ms Avg time : 2.08069e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 2540829ms Min time: 2535186ms Avg time : 2.53943e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=8  Ranks/node=8  OMP threads=14
+Slurm: cpus-per-task=14  ntasks-per-socket=4
+STARTING solver execution at rank 0 || 2025-11-05 15:27:15.031
+ENDING solver execution at rank 0 || 2025-11-05 15:27:17.270
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 303225ms Min time: 199089ms Avg time : 260248ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 13558ms Min time: 12144ms Avg time : 12648.7ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 2042366ms Min time: 1938649ms Avg time : 1.9792e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 2246812ms Min time: 2239575ms Avg time : 2.2434e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=8  Ranks/node=14  OMP threads=8
+Slurm: cpus-per-task=8  ntasks-per-socket=7
+STARTING solver execution at rank 0 || 2025-11-05 15:28:39.486
+ENDING solver execution at rank 0 || 2025-11-05 15:28:41.709
+
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 314919ms Min time: 219484ms Avg time : 272502ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  7832ms Min time:  7115ms Avg time : 7422.41ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 2017075ms Min time: 1920807ms Avg time : 1.95628e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 2241002ms Min time: 2223522ms Avg time : 2.23289e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+====================================================================================================================
+
+
+Nodes=10  Ranks/node=14  OMP threads=8
+Slurm: cpus-per-task=8  ntasks-per-socket=7
+STARTING solver execution at rank 0 || 2025-11-05 15:29:42.878
+ENDING solver execution at rank 0 || 2025-11-05 15:29:44.665
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 257211ms Min time: 119140ms Avg time : 217984ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  6336ms Min time:  5773ms Avg time : 5999.86ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 1669426ms Min time: 1533834ms Avg time : 1.5703e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 1797423ms Min time: 1785924ms Avg time : 1.79207e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=10  Ranks/node=8  OMP threads=14
+Slurm: cpus-per-task=14  ntasks-per-socket=4
+STARTING solver execution at rank 0 || 2025-11-05 15:31:30.347
+ENDING solver execution at rank 0 || 2025-11-05 15:31:32.295
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 389295ms Min time: 261517ms Avg time : 338697ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 10658ms Min time:  9745ms Avg time : 10110.4ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 1687731ms Min time: 1557125ms Avg time : 1.60854e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 1954314ms Min time: 1947980ms Avg time : 1.95079e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=10  Ranks/node=4  OMP threads=28
+Slurm: cpus-per-task=28  ntasks-per-socket=2
+STARTING solver execution at rank 0 || 2025-11-05 15:32:25.525
+ENDING solver execution at rank 0 || 2025-11-05 15:32:27.785
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 666908ms Min time: 495608ms Avg time : 564001ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 20729ms Min time: 19263ms Avg time : 19841.3ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 1766101ms Min time: 1591445ms Avg time : 1.69789e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 2267530ms Min time: 2259938ms Avg time : 2.26563e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=10  Ranks/node=28  OMP threads=4
+Slurm: cpus-per-task=4  ntasks-per-socket=14
+STARTING solver execution at rank 0 || 2025-11-05 15:36:40.839
+ENDING solver execution at rank 0 || 2025-11-05 15:36:42.604
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 270665ms Min time: 181922ms Avg time : 226278ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  3719ms Min time:  3019ms Avg time : 3314.81ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 1588536ms Min time: 1508567ms Avg time : 1.54673e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 1782937ms Min time: 1765409ms Avg time : 1.77682e+06ms
+----------------------------------------------------------------------------------------------------
+
+Nodes=10  Ranks/node=56  OMP threads=2
+Slurm: cpus-per-task=2  ntasks-per-socket=28
+STARTING solver execution at rank 0 || 2025-11-05 15:37:43.080
+ENDING solver execution at rank 0 || 2025-11-05 15:37:44.839
+
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 338686ms Min time: 186023ms Avg time : 230757ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time:  2076ms Min time:  1697ms Avg time : 1903.77ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 1582320ms Min time: 1448340ms Avg time : 1.54295e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 1793763ms Min time: 1758425ms Avg time : 1.77767e+06ms
+----------------------------------------------------------------------------------------------------
+
+
+Nodes=10  Ranks/node=2  OMP threads=56
+Slurm: cpus-per-task=56  ntasks-per-socket=1
+STARTING solver execution at rank 0 || 2025-11-05 15:38:52.399
+ENDING solver execution at rank 0 || 2025-11-05 15:38:55.031
+
+----------------------------------------------------------------------------------------------------
+Function : EXCHANGE BOUNDARIES  Max time: 606333ms Min time: 305502ms Avg time : 497799ms
+----------------------------------------------------------------------------------------------------
+Function : INIT fields with Halo Max time: 40161ms Min time: 38343ms Avg time : 38836.8ms
+----------------------------------------------------------------------------------------------------
+Function : SOLVE AND SWAP       Max time: 2322124ms Min time: 2019520ms Avg time : 2.13006e+06ms
+----------------------------------------------------------------------------------------------------
+Function : Solve + swap + Communicate Max time: 2634637ms Min time: 2630750ms Avg time : 2.63277e+06ms
+----------------------------------------------------------------------------------------------------

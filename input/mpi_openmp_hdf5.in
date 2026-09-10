@@ -1,0 +1,5 @@
+dimension_nb 5000
+corner 100
+field_fill 0.5
+max_steps 10000
+print_interval 500
