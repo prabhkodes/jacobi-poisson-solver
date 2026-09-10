@@ -1,15 +1,30 @@
 # jacobi-poisson-solver
 
-The same 2-D Laplace problem solved four ways — hybrid MPI+OpenMP, the same thing with parallel HDF5
-checkpointing, an OpenACC GPU port, and an NVSHMEM version — to see how each parallel model behaves
-when you actually scale it, and what it costs to write files while you do.
+The same 2-D Laplace problem solved four ways, to see how each parallel model behaves when you actually
+scale it — and what it costs to write files while you do.
 
-**Stack:** C++20 · MPI · OpenMP · OpenACC · NVSHMEM · HDF5 · CMake-free Makefile builds · Docker ·
-Nsight Systems · SLURM
+| Variant | Model | What it adds | Benchmarked to |
+|---|---|---|---|
+| [`mpi-openmp/`](mpi-openmp/) | MPI + OpenMP | Baseline hybrid — `#pragma omp parallel for collapse(2) schedule(static)` over the stencil | 1120 cores / 10 nodes |
+| [`mpi-openmp-hdf5/`](mpi-openmp-hdf5/) | + parallel HDF5 | Collective writes from every rank into one shared `.h5`, at a configurable step interval | 1120 cores / 10 nodes |
+| [`mpi-openacc/`](mpi-openacc/) | MPI + OpenACC | GPU offload with explicit data regions; halos sent straight out of device memory | 40 × A100 / 10 nodes |
+| [`nvshmem/`](nvshmem/) | NVSHMEM | GPU-initiated halo exchange — no return to the host, no MPI in the inner loop | not benchmarked |
+
+**What the runs showed**
+
+- **94% parallel efficiency out to 1120 cores** — 9.38× on 10 nodes, halo exchange staying under 15% of
+  runtime the whole way.
+- **The rank/thread split is worth 2×**, at nearly every node count. Same cores, same binary, 2.08×
+  apart. Few ranks × many threads always loses to NUMA.
+- **Checkpointing changes which configuration is fastest.** The config with the quickest compute has
+  the slowest total time once writes are counted — by 34%.
+- **GPU scaling stalls around 16 A100s** at this problem size: compute keeps shrinking, communication
+  doesn't.
+
+**Stack:** C++20 · MPI · OpenMP · OpenACC · NVSHMEM · HDF5 · Docker · Nsight Systems · SLURM
 
 **Where it ran:** Leonardo at CINECA — DCGP partition for CPU runs (112 cores per node, 2× Intel
-Sapphire Rapids) and Booster for GPU runs (4× A100 64 GB per node, 200 Gbps HDR InfiniBand). Up to 10
-nodes / 1120 cores on CPU, up to 40 A100s on GPU.
+Sapphire Rapids) and Booster for GPU runs (4× A100 64 GB per node, 200 Gbps HDR InfiniBand).
 
 ## The problem
 
@@ -31,17 +46,9 @@ u_new[i][j] = 0.25 * (u_old[i-1][j] + u_old[i+1][j] + u_old[i][j-1] + u_old[i][j
 That last number is the whole story: this kernel is bandwidth-bound, not compute-bound. Nothing below
 is limited by how fast the FPUs go.
 
-## The four variants
-
-| Directory | Model | What it adds |
-|---|---|---|
-| [`mpi-openmp/`](mpi-openmp/) | MPI + OpenMP | Baseline hybrid. `#pragma omp parallel for collapse(2) schedule(static)` over the stencil |
-| [`mpi-openmp-hdf5/`](mpi-openmp-hdf5/) | MPI + OpenMP + HDF5 | Collective parallel writes to a single shared `.h5` file at a configurable interval |
-| [`mpi-openacc/`](mpi-openacc/) | MPI + OpenACC | GPU offload with explicit data regions; halos exchanged straight from device memory |
-| [`nvshmem/`](nvshmem/) | NVSHMEM | GPU-initiated communication — halo exchange without returning to the host or to MPI |
-
-The OpenACC version uses `#pragma acc host_data use_device(...)` around the exchange, so GPU-aware MPI
-moves halo buffers device-to-device instead of staging through host memory.
+Both GPU variants keep halo buffers resident on the device. The OpenACC one wraps the exchange in
+`#pragma acc host_data use_device(...)`, so GPU-aware MPI moves them device-to-device rather than
+staging through host memory; the NVSHMEM one goes further and skips MPI in the inner loop entirely.
 
 ## CPU scaling — N = 10,000², 1000 steps
 
