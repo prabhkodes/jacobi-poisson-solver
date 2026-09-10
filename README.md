@@ -28,34 +28,40 @@ Sapphire Rapids) and Booster for GPU runs (4× A100 64 GB per node, 200 Gbps HDR
 
 ## The problem
 
-Jacobi iteration on a 2-D grid: every cell becomes the average of its four neighbours, repeat until it
-relaxes. It's the standard model problem for stencil codes — trivial arithmetic, heavy memory traffic,
-and a halo exchange every single step, so it stresses exactly the things that matter when you scale.
+Jacobi iteration on a 2-D grid — every cell becomes the average of its four neighbours, repeat until it
+relaxes.
 
 ```
 u_new[i][j] = 0.25 * (u_old[i-1][j] + u_old[i+1][j] + u_old[i][j-1] + u_old[i][j+1])
 ```
 
-| | |
+Why it's the standard model problem for stencil codes:
+
+- Trivial arithmetic — nothing hides behind clever maths
+- Heavy memory traffic — you measure the memory system, not the FPUs
+- A halo exchange every single step — communication cost shows up immediately
+
+| Property | Value |
 |---|---|
 | Precision | `double` (`CMesh<double>`), 8 bytes |
 | Decomposition | 1-D row-block across MPI ranks, one halo row each side |
 | Halo exchange | Custom MPI derived datatypes (`mpi_dt.hpp`) |
 | Arithmetic intensity | 5 flop per cell, ≥16 B compulsory traffic → **0.31 flop/byte** |
 
-That last number is the whole story: this kernel is bandwidth-bound, not compute-bound. Nothing below
-is limited by how fast the FPUs go.
+→ **Bandwidth-bound, not compute-bound.** Nothing below is limited by FPU throughput.
 
-Both GPU variants keep halo buffers resident on the device. The OpenACC one wraps the exchange in
-`#pragma acc host_data use_device(...)`, so GPU-aware MPI moves them device-to-device rather than
-staging through host memory; the NVSHMEM one goes further and skips MPI in the inner loop entirely.
+How each GPU variant handles halos:
+
+| Variant | Halo path |
+|---|---|
+| `mpi-openacc` | `#pragma acc host_data use_device(...)` — GPU-aware MPI moves buffers device-to-device, no host staging |
+| `nvshmem` | No MPI in the inner loop at all; the GPU initiates the exchange itself |
 
 ## CPU scaling — N = 10,000², 1000 steps
 
-> **Compiled `-O0 -g`.** The exam runs were deliberately built without optimisation, so the wall-clock
-> numbers below are not a statement about achievable performance — a `-O3` build is several times
-> faster. What they do measure honestly is *scaling*: every configuration was built and run
-> identically, so the speedups and the rank/thread comparison hold.
+> **Compiled `-O0 -g`.** Built without optimisation, so these wall-clock times are **not** a performance
+> result — a `-O3` build is several times faster. Every configuration used the same binary, so the
+> *scaling* and the rank/thread comparison are valid.
 
 Two 0.75 GiB fields. Best configuration at each node count, solve plus halo exchange.
 
@@ -67,11 +73,11 @@ Two 0.75 GiB fields. Best configuration at each node count, solve plus halo exch
 | 8 | 896 | 112 ranks × 8 threads | 2.02 s | 0.31 s | 2.33 s | 7.48× | 93% |
 | 10 | 1120 | 280 ranks × 4 threads | 1.59 s | 0.27 s | 1.86 s | **9.38×** | 94% |
 
-94% efficiency out to 1120 cores. Halo exchange stays under 15% of runtime the whole way.
+→ **94% efficiency to 1120 cores.** Halo exchange stays under 15% of runtime throughout.
 
 ![CPU latency split](results/plots/cpu_latency_split.png)
 
-**How you split ranks and threads is worth 2×, at nearly every node count.**
+### The rank/thread split is worth 2×
 
 | Nodes | Best | Worst | Spread |
 |---:|---|---|---:|
@@ -80,18 +86,24 @@ Two 0.75 GiB fields. Best configuration at each node count, solve plus halo exch
 | 8 | 112×8 — 2.33 s | 16×56 — 4.90 s | 2.10× |
 | 10 | 280×4 — 1.86 s | 20×56 — 2.93 s | 1.58× |
 
-Same nodes, same cores, same binary. Few ranks × many threads always loses: a rank spanning both
-sockets keeps touching memory attached to the other one. Many ranks with 2–8 threads each keeps every
-thread on its own NUMA domain, which is why the jobs set `OMP_PROC_BIND=close` and `OMP_PLACES=cores`.
+- Same nodes, same cores, same binary — 2× apart
+- **Few ranks × many threads always loses.** A rank spanning both sockets keeps touching memory
+  attached to the other one
+- **Many ranks × 2–8 threads wins.** Every thread stays in its own NUMA domain
+- Jobs set `OMP_PROC_BIND=close` and `OMP_PLACES=cores` for exactly this reason
 
-## Parallel I/O — what checkpointing actually costs
+## Parallel I/O — what checkpointing costs
 
-**Different problem: N = 5,000², not 10,000².** The HDF5 variant writes every rank's slab into one shared file collectively, at a configurable step
-interval. 27 configurations, four latency components:
+> **Different problem size: N = 5,000², not 10,000².**
+
+The HDF5 variant writes every rank's slab collectively into one shared `.h5` file, at a configurable
+step interval. 27 configurations, four latency components:
 
 ![I/O latency split](results/plots/io_latency_split.png)
 
-**Writing less often helps roughly linearly.** Same 8-node, 8-ranks × 14-thread configuration:
+### Writing less often helps roughly linearly
+
+8 nodes, 8 ranks × 14 threads:
 
 | Write every | I/O time | Solve time |
 |---:|---:|---:|
@@ -99,10 +111,11 @@ interval. 27 configurations, four latency components:
 | 1000 steps | 2555 ms | 4369 ms |
 | 2000 steps | 1411 ms | 4384 ms |
 
-Solve time doesn't move — the writes aren't perturbing the compute, they're just additive.
+→ Solve time doesn't move. The writes are purely additive, not perturbing the compute.
 
-**But more ranks means more I/O contention, and that flips which configuration is fastest.** At 8 nodes,
-writing every 500 steps:
+### More ranks means more I/O contention — and that flips the optimum
+
+8 nodes, writing every 500 steps:
 
 | Ranks/node | Solve | I/O | Total |
 |---:|---:|---:|---:|
@@ -112,16 +125,19 @@ writing every 500 steps:
 | 28 | 4055 ms | 4222 ms | 8277 ms |
 | 56 | **3999 ms** | 6071 ms | 10071 ms |
 
-56 ranks/node has the fastest compute of any configuration and the slowest total by 34%. More ranks
-means more concurrent writers hitting the parallel filesystem, and past about 8 ranks per node that
-contention grows faster than the compute savings.
+- 56 ranks/node has the **fastest compute** of any configuration
+- 56 ranks/node also has the **slowest total**, by 34%
+- More ranks means more concurrent writers on the parallel filesystem
+- Past ~8 ranks/node, contention grows faster than the compute savings
 
-**Tuning on compute time alone picks the wrong configuration.** You have to measure the I/O.
+→ **Tuning on compute time alone picks the wrong configuration.** You have to measure the I/O.
 
 ## GPU scaling — N = 20,000², 1000 steps
 
-Two 2.98 GiB fields. **Not comparable to the CPU numbers above** — four times the grid, and built
-`-O3 -acc -gpu=cc80` where the CPU runs were `-O0`.
+> **Not comparable to the CPU tables** — 4× the grid, and built `-O3 -acc -gpu=cc80` where the CPU runs
+> were `-O0`.
+
+Two 2.98 GiB fields.
 
 | GPUs | Nodes | Time | GFLOP/s | Speedup | Efficiency | Field per GPU |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -132,18 +148,21 @@ Two 2.98 GiB fields. **Not comparable to the CPU numbers above** — four times 
 
 ![GPU strong scaling](results/plots/gpu_strong_scaling.png)
 
-Efficiency falls off exactly as you'd expect from the breakdown: compute time drops with more GPUs but
-communication stays roughly flat, so by 40 GPUs the halo exchange is most of the runtime and each card
-only holds 150 MiB. Classic strong-scaling wall — the fix is a bigger problem, or overlapping the
-exchange with compute.
+- Compute time drops with more GPUs; **communication stays roughly flat**
+- By 40 GPUs the halo exchange is most of the runtime
+- Each card then holds only 150 MiB — not enough work to cover the exchange
+- Classic strong-scaling wall. Fixes: a bigger problem, or overlap the exchange with compute
 
-Nsight Systems traces are in [`results/gpu/`](results/gpu/), collected with
+Nsight traces are in [`results/gpu/`](results/gpu/), collected with
 [`scripts/slurm/nsys_profile.sh`](scripts/slurm/nsys_profile.sh).
 
 ## Build and run
 
-Each variant is standalone. All of them read a plain text input file from [`input/`](input/) and take
-the same parameters: grid size, corner value, initial fill, step count.
+- Each variant is standalone
+- All read a plain-text config from [`input/`](input/): grid size, corner value, initial fill, step count
+- SLURM scripts for every variant are in [`scripts/slurm/`](scripts/slurm/)
+- Output goes to `files/`, animate with [`results/analysis/animate_jacobi.gp`](results/analysis/animate_jacobi.gp)
+- The OpenACC build has a [`Dockerfile`](mpi-openacc/Dockerfile) if you'd rather not install the NVIDIA HPC SDK
 
 **MPI + OpenMP**
 
@@ -162,7 +181,7 @@ OMP_NUM_THREADS=4 mpirun -n 8 ./jacobi_io.x input/mpi_openmp_hdf5.in
 h5ls -r files/jacobi.h5      # inspect the output
 ```
 
-**MPI + OpenACC** — needs the NVIDIA HPC SDK.
+**MPI + OpenACC** — needs the NVIDIA HPC SDK
 
 ```bash
 mpic++ -O3 -std=c++20 -acc -gpu=cc80 -Minfo=accel -Impi-openacc/include \
@@ -170,24 +189,14 @@ mpic++ -O3 -std=c++20 -acc -gpu=cc80 -Minfo=accel -Impi-openacc/include \
 mpirun -n 4 ./jacobi_gpu.x input/mpi_openacc.in
 ```
 
-A [`Dockerfile`](mpi-openacc/Dockerfile) is included for the OpenACC build if you'd rather not set the
-toolchain up locally.
-
-SLURM scripts for all of them are in [`scripts/slurm/`](scripts/slurm/). Output goes to `files/` and
-can be animated with [`results/analysis/animate_jacobi.gp`](results/analysis/animate_jacobi.gp).
-
 ## Caveats
 
-**Timer unit label is wrong.** `timer.hpp` does `duration_cast<std::chrono::microseconds>` but prints
-the unit as `ms`. Everything in [`results/cpu/`](results/cpu/) and [`results/gpu/`](results/gpu/) is
-microseconds despite the label — cross-checked against the wall-clock stamps in the same files, and
-converted correctly in every table here. Left as-is so the published numbers match the raw output.
-
-**The CPU runs are `-O0`.** Stated above too, but worth repeating: treat those wall-clock times as a
-scaling study, not a performance result.
-
-**The three studies use three different problem sizes** — 10,000² for the hybrid CPU runs, 5,000² for
-the I/O study, 20,000² for the GPU runs. Don't read across the tables.
+| Caveat | Detail |
+|---|---|
+| **Timer unit label is wrong** | `timer.hpp` casts to `microseconds` but prints `ms`. Everything in [`results/`](results/) is microseconds — verified against the wall-clock stamps in the same files, and converted correctly in every table here. Left as-is so published numbers match raw output |
+| **CPU runs are `-O0`** | Treat those wall-clock times as a scaling study, not a performance result |
+| **Three different problem sizes** | 10,000² hybrid CPU · 5,000² I/O · 20,000² GPU. Don't read across the tables |
+| **NVSHMEM variant is unbenchmarked** | Source is here; no scaling runs of its own |
 
 ## Layout
 
@@ -202,20 +211,26 @@ results/
   cpu/  io/  gpu/      raw timing output
   plots/               figures used above
   analysis/            plotting and animation scripts
+  exam-report.md       full write-up with raw run tables
 ```
 
-Each variant keeps its own `include/` — `mesh.hpp` (the solver and halo logic), `mpi_dt.hpp` (derived
-datatypes), `timer.hpp`, `printer.hpp`, and for the HDF5 build `parallel_jacobi_write.hpp`. Regression
-tests are in each variant's `tests/`.
+Each variant carries its own `include/` and `tests/`:
+
+| Header | Contents |
+|---|---|
+| `mesh.hpp` | Solver and halo logic |
+| `mpi_dt.hpp` | MPI derived datatypes for the exchange |
+| `timer.hpp` | Per-rank function timing |
+| `printer.hpp` | Field output |
+| `parallel_jacobi_write.hpp` | Collective HDF5 writes (HDF5 variant only) |
 
 ## Where this came from
 
-The full exam write-up, including the raw run tables these figures come from, is in
-[`results/exam-report.md`](results/exam-report.md).
-
-Coursework for the Master in High Performance Computing (ICTP / SISSA, Trieste), 2025–26 — the hybrid
-and I/O versions from *P1.5 Parallel Programming*, the GPU versions from *P1.7 GPU Programming* and
-*P2.2 GPU Programming 2*. Parts have been public since June 2026 in
-[`prabhkodes/heterogenous_computing`](https://github.com/prabhkodes/heterogenous_computing) and
-[`prabhkodes/file_io_stuff`](https://github.com/prabhkodes/file_io_stuff). The course repositories
-belong to SISSA and are private.
+| | |
+|---|---|
+| Course | Master in High Performance Computing, ICTP / SISSA Trieste, 2025–26 |
+| Hybrid + I/O variants | *P1.5 Parallel Programming* |
+| GPU variants | *P1.7 GPU Programming*, *P2.2 GPU Programming 2* |
+| Full write-up | [`results/exam-report.md`](results/exam-report.md) — raw run tables behind every figure |
+| Already public since June 2026 | [`prabhkodes/heterogenous_computing`](https://github.com/prabhkodes/heterogenous_computing), [`prabhkodes/file_io_stuff`](https://github.com/prabhkodes/file_io_stuff) |
+| Course repositories | Belong to SISSA, private |
