@@ -45,40 +45,44 @@ moves halo buffers device-to-device instead of staging through host memory.
 
 ## CPU scaling — N = 10,000², 1000 steps
 
-500 GFLOP of work, two 0.75 GiB fields. Times are the best configuration at each node count.
+> **Compiled `-O0 -g`.** The exam runs were deliberately built without optimisation, so the wall-clock
+> numbers below are not a statement about achievable performance — a `-O3` build is several times
+> faster. What they do measure honestly is *scaling*: every configuration was built and run
+> identically, so the speedups and the rank/thread comparison hold.
 
-| Nodes | Cores | Best config | Time | GFLOP/s | Speedup |
-|---:|---:|---|---:|---:|---:|
-| 1 | 112 | 28 ranks × 4 threads | 16.89 s | 29.6 | 1× |
-| 2 | 224 | 112 ranks × 2 threads | 8.62 s | 58.0 | 1.96× |
-| 8 | 896 | 224 ranks × 4 threads | 2.21 s | 225.9 | 7.6× |
-| 10 | 1120 | 280 ranks × 4 threads | 1.78 s | 280.4 | **9.5×** |
+Two 0.75 GiB fields. Best configuration at each node count, solve plus halo exchange.
 
-9.5× on 10× the hardware — 95% parallel efficiency out to 1120 cores.
+| Nodes | Cores | Best config | Solve | Halo | Total | Speedup | Efficiency |
+|---:|---:|---|---:|---:|---:|---:|---:|
+| 1 | 112 | 28 ranks × 4 threads | 16.65 s | 0.79 s | 17.44 s | 1× | — |
+| 2 | 224 | 112 ranks × 2 threads | 8.36 s | 0.56 s | 8.92 s | 1.95× | 98% |
+| 4 | 448 | 56 ranks × 8 threads | 4.08 s | 0.41 s | 4.49 s | 3.89× | 97% |
+| 8 | 896 | 112 ranks × 8 threads | 2.02 s | 0.31 s | 2.33 s | 7.48× | 93% |
+| 10 | 1120 | 280 ranks × 4 threads | 1.59 s | 0.27 s | 1.86 s | **9.38×** | 94% |
 
-![CPU latency breakdown](results/plots/cpu_latency_breakdown.png)
+94% efficiency out to 1120 cores. Halo exchange stays under 15% of runtime the whole way.
 
-**How you split ranks and threads is worth 2× — consistently.** At every single node count, the best
-configuration beats the worst by almost exactly the same factor:
+![CPU latency split](results/plots/cpu_latency_split.png)
+
+**How you split ranks and threads is worth 2×, at nearly every node count.**
 
 | Nodes | Best | Worst | Spread |
 |---:|---|---|---:|
-| 1 | 28×4 — 16.89 s | 2×56 — 34.58 s | 2.05× |
-| 2 | 112×2 — 8.62 s | 4×56 — 17.65 s | 2.05× |
-| 8 | 224×4 — 2.21 s | 16×56 — 4.51 s | 2.04× |
-| 10 | 280×4 — 1.78 s | 20×56 — 2.63 s | 1.48× |
+| 1 | 28×4 — 17.44 s | 2×56 — 36.36 s | 2.08× |
+| 2 | 112×2 — 8.92 s | 4×56 — 19.35 s | 2.17× |
+| 8 | 112×8 — 2.33 s | 16×56 — 4.90 s | 2.10× |
+| 10 | 280×4 — 1.86 s | 20×56 — 2.93 s | 1.58× |
 
-Same nodes, same cores, same code — 2× apart. Few ranks with many threads always loses, because a rank
-spanning both sockets keeps touching memory attached to the other one. Many ranks with 2–4 threads each
-keeps every thread on its own NUMA domain. All the raw runs are in
-[`results/cpu/combined.dat`](results/cpu/combined.dat).
+Same nodes, same cores, same binary. Few ranks × many threads always loses: a rank spanning both
+sockets keeps touching memory attached to the other one. Many ranks with 2–8 threads each keeps every
+thread on its own NUMA domain, which is why the jobs set `OMP_PROC_BIND=close` and `OMP_PLACES=cores`.
 
 ## Parallel I/O — what checkpointing actually costs
 
-The HDF5 variant writes every rank's slab into one shared file collectively, at a configurable step
+**Different problem: N = 5,000², not 10,000².** The HDF5 variant writes every rank's slab into one shared file collectively, at a configurable step
 interval. 27 configurations, four latency components:
 
-![I/O latency breakdown](results/plots/io_latency_breakdown.png)
+![I/O latency split](results/plots/io_latency_split.png)
 
 **Writing less often helps roughly linearly.** Same 8-node, 8-ranks × 14-thread configuration:
 
@@ -109,8 +113,8 @@ contention grows faster than the compute savings.
 
 ## GPU scaling — N = 20,000², 1000 steps
 
-Four times the grid of the CPU runs — 2.0 TFLOP, two 2.98 GiB fields. Not comparable to the CPU numbers
-above; different problem size.
+Two 2.98 GiB fields. **Not comparable to the CPU numbers above** — four times the grid, and built
+`-O3 -acc -gpu=cc80` where the CPU runs were `-O0`.
 
 | GPUs | Nodes | Time | GFLOP/s | Speedup | Efficiency | Field per GPU |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -165,13 +169,18 @@ toolchain up locally.
 SLURM scripts for all of them are in [`scripts/slurm/`](scripts/slurm/). Output goes to `files/` and
 can be animated with [`results/analysis/animate_jacobi.gp`](results/analysis/animate_jacobi.gp).
 
-## Known issue
+## Caveats
 
-The timing header reports `duration_cast<std::chrono::microseconds>` but prints the unit as `ms`. Every
-number in [`results/cpu/`](results/cpu/) and [`results/gpu/`](results/gpu/) is therefore in
-**microseconds** despite the label — cross-checked against the wall-clock stamps in the same files, and
-converted correctly in every table above. Worth fixing in `timer.hpp`; left as-is here so the published
-numbers match the raw output.
+**Timer unit label is wrong.** `timer.hpp` does `duration_cast<std::chrono::microseconds>` but prints
+the unit as `ms`. Everything in [`results/cpu/`](results/cpu/) and [`results/gpu/`](results/gpu/) is
+microseconds despite the label — cross-checked against the wall-clock stamps in the same files, and
+converted correctly in every table here. Left as-is so the published numbers match the raw output.
+
+**The CPU runs are `-O0`.** Stated above too, but worth repeating: treat those wall-clock times as a
+scaling study, not a performance result.
+
+**The three studies use three different problem sizes** — 10,000² for the hybrid CPU runs, 5,000² for
+the I/O study, 20,000² for the GPU runs. Don't read across the tables.
 
 ## Layout
 
@@ -193,6 +202,9 @@ datatypes), `timer.hpp`, `printer.hpp`, and for the HDF5 build `parallel_jacobi_
 tests are in each variant's `tests/`.
 
 ## Where this came from
+
+The full exam write-up, including the raw run tables these figures come from, is in
+[`results/exam-report.md`](results/exam-report.md).
 
 Coursework for the Master in High Performance Computing (ICTP / SISSA, Trieste), 2025–26 — the hybrid
 and I/O versions from *P1.5 Parallel Programming*, the GPU versions from *P1.7 GPU Programming* and
