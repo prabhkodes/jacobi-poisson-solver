@@ -1,5 +1,14 @@
 # jacobi-poisson-solver
 
+![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat-square&logo=cplusplus&logoColor=white)
+![MPI](https://img.shields.io/badge/MPI-364d6e?style=flat-square&logoColor=white)
+![OpenMP](https://img.shields.io/badge/OpenMP-006DB8?style=flat-square&logoColor=white)
+![OpenACC](https://img.shields.io/badge/OpenACC-FF6200?style=flat-square&logoColor=white)
+![NVSHMEM](https://img.shields.io/badge/NVSHMEM-76B900?style=flat-square&logo=nvidia&logoColor=white)
+![HDF5](https://img.shields.io/badge/HDF5-0096D6?style=flat-square&logoColor=white)
+![Nsight](https://img.shields.io/badge/Nsight-76B900?style=flat-square&logo=nvidia&logoColor=white)
+![SLURM](https://img.shields.io/badge/SLURM-46a2f1?style=flat-square&logoColor=white)
+
 The same 2-D Laplace problem solved four ways, to see how each parallel model behaves when you actually
 scale it — and what it costs to write files while you do.
 
