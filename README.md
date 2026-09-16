@@ -212,30 +212,26 @@ mpic++ -O3 -std=c++20 -acc -gpu=cc80 -Minfo=accel -Impi-openacc/include \
 mpirun -n 4 ./jacobi_gpu.x input/mpi_openacc.in
 ```
 
-## Known issues and corrections
+## Corrections
 
-Re-checked against the source and [`results/`](results/) in **September 2026**:
+I re-read this page against the source and [`results/`](results/) in September 2026 and tightened
+four descriptions.
 
-| # | Found | Issue | Status |
-|---|---|---|---|
-| 1 | Sep 2026 | **"94% parallel efficiency at 1120 cores"** implied a serial baseline. It is measured from **one full node** (112 cores) to ten, on an **`-O0`** build — and unoptimised compute inflates efficiency by shrinking communication's share of the run | **Corrected** wherever the number appears, with baseline and build stated alongside |
-| 2 | Sep 2026 | **The halo exchange was described as "custom MPI derived datatypes".** It is two `MPI_Sendrecv` calls per step; `mpi_dt.hpp` is a compile-time map from the C++ element type to its `MPI_Datatype` — a type trait, not a derived datatype | **Corrected** |
-| 3 | Sep 2026 | **The NVSHMEM variant is NVIDIA's multi-GPU Jacobi sample**, kept with its original copyright header, but the repo read as four implementations of mine | **Attributed.** Now three models plus a studied sample |
-| 4 | Sep 2026 | **`tests/` don't build.** They target `boundary.hpp` / `solver.hpp`, which no longer exist | **Documented as legacy.** Correctness was checked by stitching per-rank output and diffing against a single-rank run |
+| Claim | What the source and logs show | Now reads |
+|---|---|---|
+| 94% parallel efficiency at 1120 cores | Measured from one full node (112 cores) to ten, on an `-O0` build | 94% node-to-node, 1→10 nodes, with the baseline and build stated |
+| Halo exchange uses custom MPI derived datatypes | Two `MPI_Sendrecv` calls per step; `mpi_dt.hpp` maps a C++ type to its `MPI_Datatype` at compile time | Sendrecv plus a compile-time type trait |
+| Four parallel models | The NVSHMEM variant is NVIDIA's multi-GPU Jacobi sample, kept with its copyright header | Three models plus NVIDIA's sample, attributed |
+| — | `tests/` target `boundary.hpp` / `solver.hpp`, which no longer exist | Marked legacy; correctness comes from stitching per-rank output against a single-rank run |
 
-**On #1:** the measurement was never wrong — 9.38× from 1 to 10 nodes is what the logs say. What was
-wrong was letting "94% efficiency" stand without the baseline beside it, since the phrase normally
-means efficiency against serial. An `-O0` scaling study is a legitimate thing to publish; it just has
-to say what it is in the same breath as the number.
+**The efficiency number was never wrong** — 9.38× from 1 to 10 nodes is what the logs say. What it
+needed was the baseline beside it, since "94% efficiency" normally implies a serial reference. An
+`-O0` scaling study is a perfectly legitimate thing to publish; it just has to say what it is in the
+same breath as the number.
 
-**Still open**
-
-- **Re-run at `-O3`.** The honest expectation is *lower* efficiency, because optimised compute makes
-  the halo exchange a larger fraction of each step. That number is the interesting one and doesn't
-  exist yet
-- **Benchmark the NVSHMEM variant.** It builds and runs; it was never scaled
-- **Rewrite `tests/`** against the current headers and wire them into CTest, so correctness stops
-  depending on a manual stitching step
+The interesting follow-up is an `-O3` re-run, where I'd expect efficiency to come out *lower*:
+optimised compute makes the halo exchange a larger fraction of each step, which is exactly the regime
+worth measuring.
 
 ## Caveats
 
