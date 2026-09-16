@@ -9,8 +9,9 @@
 ![Nsight](https://img.shields.io/badge/Nsight-76B900?style=flat-square&logo=nvidia&logoColor=white)
 ![SLURM](https://img.shields.io/badge/SLURM-46a2f1?style=flat-square&logoColor=white)
 
-The same 2-D Laplace problem solved four ways, to see how each parallel model behaves when you actually
-scale it — and what it costs to write files while you do.
+The same 2-D Laplace problem in three parallel models — MPI + OpenMP, the same with collective HDF5
+checkpointing, and MPI + OpenACC — plus NVIDIA's NVSHMEM multi-GPU sample for comparison, to see how each
+behaves when you actually scale it, and what it costs to write files while you do.
 
 <p align="center">
   <img src="results/plots/jacobi_diffusion.gif" width="560" alt="Jacobi iterations relaxing a hot corner">
@@ -25,12 +26,13 @@ a check that the decomposition and the I/O agree.</sub></p>
 | [`mpi-openmp/`](mpi-openmp/) | MPI + OpenMP | Baseline hybrid — `#pragma omp parallel for collapse(2) schedule(static)` over the stencil | 1120 cores / 10 nodes |
 | [`mpi-openmp-hdf5/`](mpi-openmp-hdf5/) | + parallel HDF5 | Collective writes from every rank into one shared `.h5`, at a configurable step interval | 1120 cores / 10 nodes |
 | [`mpi-openacc/`](mpi-openacc/) | MPI + OpenACC | GPU offload with explicit data regions; halos sent straight out of device memory | 40 × A100 / 10 nodes |
-| [`nvshmem/`](nvshmem/) | NVSHMEM | GPU-initiated halo exchange — no return to the host, no MPI in the inner loop | not benchmarked |
+| [`nvshmem/`](nvshmem/) | NVSHMEM | NVIDIA's multi-GPU Jacobi sample (MIT licence, copyright header kept), built and studied: GPU-initiated halo exchange, no MPI in the inner loop | not benchmarked |
 
 **What the runs showed**
 
-- **94% parallel efficiency out to 1120 cores** — 9.38× on 10 nodes, halo exchange staying under 15% of
-  runtime the whole way.
+- **94% node-to-node efficiency out to 1120 cores** — 9.38× from 1 to 10 full nodes, halo exchange
+  staying under 15% of runtime. This is a scaling study of an **`-O0` build**, measured against one full
+  node rather than a serial run.
 - **The rank/thread split is worth 2×**, at nearly every node count. Same cores, same binary, 2.08×
   apart. Few ranks × many threads always loses to NUMA.
 - **Checkpointing changes which configuration is fastest.** The config with the quickest compute has
@@ -62,7 +64,7 @@ Why it's the standard model problem for stencil codes:
 |---|---|
 | Precision | `double` (`CMesh<double>`), 8 bytes |
 | Decomposition | 1-D row-block across MPI ranks, one halo row each side |
-| Halo exchange | Custom MPI derived datatypes (`mpi_dt.hpp`) |
+| Halo exchange | Two `MPI_Sendrecv` calls per step; `mpi_dt.hpp` maps the C++ element type to its MPI datatype at compile time |
 | Arithmetic intensity | 5 flop per cell, ≥16 B compulsory traffic → **0.31 flop/byte** |
 
 → **Bandwidth-bound, not compute-bound.** Nothing below is limited by FPU throughput.
@@ -78,9 +80,11 @@ How each GPU variant handles halos:
 
 > **Compiled `-O0 -g`.** Built without optimisation, so these wall-clock times are **not** a performance
 > result — a `-O3` build is several times faster. Every configuration used the same binary, so the
-> *scaling* and the rank/thread comparison are valid.
+> *scaling* and the rank/thread comparison are valid. The unoptimised compute also makes communication a
+> smaller share of each run, which flatters the efficiency; expect lower efficiency at `-O3`.
 
-Two 0.75 GiB fields. Best configuration at each node count, solve plus halo exchange.
+Two 0.75 GiB fields. Best configuration at each node count, solve plus halo exchange. Speed-up and
+efficiency are relative to **one full node** (112 cores).
 
 | Nodes | Cores | Best config | Solve | Halo | Total | Speedup | Efficiency |
 |---:|---:|---|---:|---:|---:|---:|---:|
@@ -90,7 +94,8 @@ Two 0.75 GiB fields. Best configuration at each node count, solve plus halo exch
 | 8 | 896 | 112 ranks × 8 threads | 2.02 s | 0.31 s | 2.33 s | 7.48× | 93% |
 | 10 | 1120 | 280 ranks × 4 threads | 1.59 s | 0.27 s | 1.86 s | **9.38×** | 94% |
 
-→ **94% efficiency to 1120 cores.** Halo exchange stays under 15% of runtime throughout.
+→ **94% efficiency from 1 to 10 nodes** (node baseline, `-O0`). Halo exchange stays under 15% of
+runtime throughout.
 
 ![CPU latency split](results/plots/cpu_latency_split.png)
 
@@ -212,9 +217,10 @@ mpirun -n 4 ./jacobi_gpu.x input/mpi_openacc.in
 | Caveat | Detail |
 |---|---|
 | **Timer unit label is wrong** | `timer.hpp` casts to `microseconds` but prints `ms`. Everything in [`results/`](results/) is microseconds — verified against the wall-clock stamps in the same files, and converted correctly in every table here. Left as-is so published numbers match raw output |
-| **CPU runs are `-O0`** | Treat those wall-clock times as a scaling study, not a performance result |
+| **CPU runs are `-O0`** | Treat those wall-clock times as a scaling study, not a performance result. Efficiency is relative to one full node, and unoptimised compute flatters it |
 | **Three different problem sizes** | 10,000² hybrid CPU · 5,000² I/O · 20,000² GPU. Don't read across the tables |
-| **NVSHMEM variant is unbenchmarked** | Source is here; no scaling runs of its own |
+| **NVSHMEM variant is NVIDIA's sample** | Kept with its original copyright header; no scaling runs of its own |
+| **`tests/` are legacy** | They were written against an earlier version of the headers (`boundary.hpp`, `solver.hpp`) and don't build against the current code. Correctness was checked by stitching per-rank output back together and comparing with a single-rank run |
 
 ## Layout
 
@@ -222,7 +228,7 @@ mpirun -n 4 ./jacobi_gpu.x input/mpi_openacc.in
 mpi-openmp/            MPI + OpenMP baseline
 mpi-openmp-hdf5/       + collective HDF5 checkpointing
 mpi-openacc/           GPU offload, + Dockerfile
-nvshmem/               GPU-initiated halo exchange
+nvshmem/               GPU-initiated halo exchange (NVIDIA sample)
 input/                 run configurations
 scripts/slurm/         batch scripts, Nsight profiling
 results/
@@ -232,12 +238,12 @@ results/
   exam-report.md       full write-up with raw run tables
 ```
 
-Each variant carries its own `include/` and `tests/`:
+Each variant carries its own `include/` (and a legacy `tests/`, see Caveats):
 
 | Header | Contents |
 |---|---|
 | `mesh.hpp` | Solver and halo logic |
-| `mpi_dt.hpp` | MPI derived datatypes for the exchange |
+| `mpi_dt.hpp` | Compile-time mapping from the C++ element type to its `MPI_Datatype` |
 | `timer.hpp` | Per-rank function timing |
 | `printer.hpp` | Field output |
 | `parallel_jacobi_write.hpp` | Collective HDF5 writes (HDF5 variant only) |
